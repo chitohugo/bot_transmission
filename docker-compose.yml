@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  bot_transmission:
+    build: .
+    container_name: telegram_bot
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    depends_on:
+      - transmission
+    networks:
+      - transmission_network
+    restart: unless-stopped
+
+  transmission:
+    image: linuxserver/transmission
+    container_name: transmission
+    env_file:
+      - .env
+    volumes:
+      - ${DOWNLOADS_DIR}:/downloads
+      - ${CONFIG_DIR}:/config
+    ports:
+      - "9091:9091"
+      - "51413:51413"
+      - "51413:51413/udp"
+    networks:
+      - transmission_network
+    restart: unless-stopped
+
+networks:
+  transmission_network:
+    driver: bridge
